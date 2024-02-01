@@ -3,7 +3,7 @@
 import { mapApiDataToModels } from '../../model/EducationModels';
 
 class ApiService {
-  static async fetchData(url: string): Promise<any> {
+  async fetchData(url: string): Promise<any> {
     try {
       const response = await fetch(url);
       const data = await response.json();

@@ -1,9 +1,7 @@
-// Service/EducationService.ts
-
-import EducationServiceImpl from './impl/EducationServiceImpl';
+import Container from '../di/Container';
 
 const EducationService = {
-  getAdultTypeOfSchoolings: () => EducationServiceImpl.getAdultTypeOfSchoolings(),
+  getAdultTypeOfSchoolings: () => Container.getEducationService().getAdultTypeOfSchoolings(),
 };
 
 export default EducationService;
