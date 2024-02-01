@@ -1,12 +1,5 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+// Import necessary dependencies
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,20 +9,16 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import EducationService from './domain/service/EducationService';
+import { AdultTypeOfSchooling } from './domain/model/EducationModels';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
+// Section component to display each adultTypeOfSchooling
+interface SectionProps {
   title: string;
-}>;
+  children?: React.ReactNode; // Make children optional
+}
 
-function Section({children, title}: SectionProps): React.JSX.Element {
+const Section = ({ title, children }: SectionProps): React.JSX.Element => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -37,29 +26,59 @@ function Section({children, title}: SectionProps): React.JSX.Element {
         style={[
           styles.sectionTitle,
           {
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: isDarkMode ? 'white' : 'black',
           },
         ]}>
         {title}
       </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+      {children && (
+        <Text
+          style={[
+            styles.sectionDescription,
+            {
+              color: isDarkMode ? 'lightgrey' : 'darkgrey',
+            },
+          ]}>
+          {children}
+        </Text>
+      )}
     </View>
   );
-}
+};
+
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [adultTypeOfSchoolings, setAdultTypeOfSchoolings] = useState<AdultTypeOfSchooling[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await EducationService.getAdultTypeOfSchoolings();
+        console.log('he')
+        if (data!= null) {
+          setAdultTypeOfSchoolings(data);
+        } else {
+          setError('No data availablesss.');
+        }
+      } catch (error) {
+        setError('Error fetching data.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      // Cleanup logic if needed
+    };
+  }, []);
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor: isDarkMode ? 'black' : 'white',
   };
 
   return (
@@ -71,18 +90,26 @@ function App(): React.JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-    
-
+        <View style={{ padding: 16 }}>
+          <View>
+            <Text>Hello world</Text>
+          </View>
+          {isLoading && <Text>Loading...</Text>}
+          {error && <Text>Error: {error}</Text>}
+          {!isLoading && !error && (
+            // Display adultTypeOfSchoolings data
+            adultTypeOfSchoolings.map((schooling: AdultTypeOfSchooling) => (
+              <Section key={schooling.id} title={schooling.value}>
+                {/* Add additional content or styling as needed */}
+              </Section>
+            ))
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   sectionContainer: {
@@ -92,15 +119,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '600',
+    color: 'black', // Adjust the color as needed
   },
   sectionDescription: {
     marginTop: 8,
     fontSize: 18,
     fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+    color: 'darkgrey', // Adjust the color as needed
   },
 });
+
 
 export default App;
